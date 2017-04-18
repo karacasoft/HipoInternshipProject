@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.karacasoft.hipointernshipentry.R;
+import com.karacasoft.hipointernshipentry.data.models.Photo;
+
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,5 +34,10 @@ public class PhotosFragment extends Fragment implements PhotosContract.View {
     @Override
     public void setPresenter(PhotosContract.Presenter presenter) {
         this.presenter = presenter;
+    }
+
+    @Override
+    public void showPhotos(List<Photo> photos) {
+
     }
 }
