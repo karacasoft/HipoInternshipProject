@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import com.karacasoft.hipointernshipentry.R;
 import com.karacasoft.hipointernshipentry.data.models.Photo;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +60,8 @@ public class PhotosFragment extends Fragment implements PhotosContract.View {
         imagesAdapter = new PhotoListAdapter(getActivity(), photos);
         imagesRecyclerView.setAdapter(imagesAdapter);
         imagesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+        imagesRecyclerView.setItemAnimator(new PhotosItemAnimator(getActivity(), R.anim.photos_list_animation_add,
+                R.anim.photos_list_animation_remove));
 
         endlessScrollListener = new EndlessScrollListener(getActivity(), imagesRecyclerView) {
             @Override
@@ -145,9 +149,15 @@ public class PhotosFragment extends Fragment implements PhotosContract.View {
         private List<Photo> photoList;
         private Context context;
 
+        private ImageLoader imgLoader;
+
         public PhotoListAdapter(Context context, List<Photo> photoList) {
             this.context = context;
             this.photoList = photoList;
+
+            ImageLoaderConfiguration config = ImageLoaderConfiguration.createDefault(context);
+            imgLoader = ImageLoader.getInstance();
+            imgLoader.init(config);
         }
 
         @Override
@@ -163,7 +173,10 @@ public class PhotosFragment extends Fragment implements PhotosContract.View {
         public void onBindViewHolder(ViewHolder holder, int position) {
             Photo p = photoList.get(position);
             holder.txtPhotoTitle.setText(p.getTitle());
-            //TODO load image in an image loader thread
+
+            holder.imgPhoto.setImageResource(R.drawable.placeholder);
+
+            imgLoader.displayImage(p.getUrlM(), holder.imgPhoto);
         }
 
         @Override
