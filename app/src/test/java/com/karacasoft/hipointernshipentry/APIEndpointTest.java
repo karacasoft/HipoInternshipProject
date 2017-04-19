@@ -2,6 +2,7 @@ package com.karacasoft.hipointernshipentry;
 
 import com.karacasoft.hipointernshipentry.data.FlickrService;
 import com.karacasoft.hipointernshipentry.data.apiresult.RecentPhotosResult;
+import com.karacasoft.hipointernshipentry.util.APIKeyProvider;
 
 import org.junit.Test;
 
@@ -45,5 +46,10 @@ public class APIEndpointTest {
 
         assertTrue(result != null);
         assertTrue(result.getPhotos().getPhoto().size() == 10);
+    }
+
+    @Test
+    public void apiKeyTest() {
+        assertTrue(APIKeyProvider.getAPIKey().equals("17b6bf0c241f5a13d1ea7be5bd0462c0"));
     }
 }

@@ -30,12 +30,16 @@ public class PhotosFragment extends Fragment implements PhotosContract.View {
 
     private PhotosContract.Presenter presenter;
 
+    public static PhotosFragment newInstance() {
+        return new PhotosFragment();
+    }
+
     public PhotosFragment() {
         // Required empty public constructor
     }
 
     @BindView(R.id.imagesRecyclerView)
-    private RecyclerView imagesRecyclerView;
+    RecyclerView imagesRecyclerView;
     private EndlessScrollListener endlessScrollListener;
     private PhotoListAdapter imagesAdapter;
 
@@ -62,22 +66,36 @@ public class PhotosFragment extends Fragment implements PhotosContract.View {
             }
         };
 
+        setPresenter(new PhotosPresenter(this));
 
         return v;
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        imagesRecyclerView.addOnScrollListener(endlessScrollListener);
+    public void onStart() {
+        super.onStart();
 
         presenter.start();
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onResume() {
+        super.onResume();
+        imagesRecyclerView.addOnScrollListener(endlessScrollListener);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
         imagesRecyclerView.removeOnScrollListener(endlessScrollListener);
+
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        presenter.stop();
     }
 
     @Override
@@ -87,7 +105,7 @@ public class PhotosFragment extends Fragment implements PhotosContract.View {
 
     @Override
     public void showError(String message) {
-        //TODO temporary Toast
+        //TODO temporarily toast the error message
         Toast.makeText(getActivity(), String.format("Error: %s", message),
                 Toast.LENGTH_SHORT).show();
     }
@@ -113,6 +131,7 @@ public class PhotosFragment extends Fragment implements PhotosContract.View {
         int oldSize = this.photos.size();
         this.photos.addAll(photos);
         this.imagesAdapter.notifyItemRangeInserted(oldSize, count);
+        endlessScrollListener.setLoading(false);
     }
 
     @Override
