@@ -7,5 +7,7 @@ package com.karacasoft.hipointernshipentry;
 public interface BaseView<T> {
 
     void setPresenter(T presenter);
+    void showError(String message);
+    void showError(Throwable t);
 
 }

@@ -13,14 +13,13 @@ import java.util.List;
 public interface PhotosContract {
 
     interface View extends BaseView<Presenter> {
-
         void showPhotos(List<Photo> photos);
-
-
+        void addPhotos(List<Photo> photos, int page);
     }
 
     interface Presenter extends BasePresenter {
-
+        void onLoadMore(int page);
+        void onRefresh();
     }
 
 }

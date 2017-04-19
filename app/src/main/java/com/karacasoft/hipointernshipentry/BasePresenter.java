@@ -6,4 +6,5 @@ package com.karacasoft.hipointernshipentry;
 
 public interface BasePresenter {
     void start();
+    void stop();
 }
