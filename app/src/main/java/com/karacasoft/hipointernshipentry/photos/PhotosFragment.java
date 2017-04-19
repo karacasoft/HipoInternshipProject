@@ -15,8 +15,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.karacasoft.hipointernshipentry.MainActivity;
 import com.karacasoft.hipointernshipentry.R;
 import com.karacasoft.hipointernshipentry.data.models.Photo;
+import com.karacasoft.hipointernshipentry.search.SearchPresenter;
+import com.karacasoft.hipointernshipentry.search.SearchViewInterface;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
@@ -32,10 +35,24 @@ import butterknife.Unbinder;
  */
 public class PhotosFragment extends Fragment implements PhotosContract.View {
 
+    public static final String ARG_SEARCH_PHOTOS = "com.karacasoft.hipointernshipentry.photos.PhotosFragment.SEARCH_PHOTOS";
+
     private PhotosContract.Presenter presenter;
 
+    public static PhotosFragment newSearchInstance() {
+        PhotosFragment fragment = new PhotosFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(ARG_SEARCH_PHOTOS, true);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     public static PhotosFragment newInstance() {
-        return new PhotosFragment();
+        PhotosFragment fragment = new PhotosFragment();
+        Bundle args = new Bundle();
+        args.putBoolean(ARG_SEARCH_PHOTOS, false);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     public PhotosFragment() {
@@ -55,7 +72,7 @@ public class PhotosFragment extends Fragment implements PhotosContract.View {
 
     private Unbinder unbinder;
 
-
+    private SearchViewInterface searchViewInterface;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -84,7 +101,16 @@ public class PhotosFragment extends Fragment implements PhotosContract.View {
             }
         });
 
-        setPresenter(new PhotosPresenter(this));
+        Bundle args = getArguments();
+
+        if(args.getBoolean(ARG_SEARCH_PHOTOS, false)) {
+            setPresenter(new SearchPresenter(this));
+            searchViewInterface = (SearchViewInterface) this.presenter;
+
+            ((MainActivity)getActivity()).setSearchViewInterface(searchViewInterface);
+        } else {
+            setPresenter(new PhotosPresenter(this));
+        }
 
         return v;
     }
@@ -162,9 +188,18 @@ public class PhotosFragment extends Fragment implements PhotosContract.View {
     }
 
     @Override
+    public void setCurrentPage(int page) {
+        endlessScrollListener.setCurrentPage(page);
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    public SearchViewInterface getSearchViewInterface() {
+        return searchViewInterface;
     }
 
     public static class PhotoListAdapter extends RecyclerView.Adapter<PhotoListAdapter.ViewHolder> {

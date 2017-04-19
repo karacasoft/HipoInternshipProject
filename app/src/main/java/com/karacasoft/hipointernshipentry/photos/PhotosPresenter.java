@@ -19,10 +19,10 @@ public class PhotosPresenter implements PhotosContract.Presenter {
 
     public static final int RESULTS_PER_PAGE = 10;
 
-    private PhotosContract.View view;
-    private FlickrService flickrService;
+    protected PhotosContract.View view;
+    protected FlickrService flickrService;
 
-    private boolean attached = false;
+    protected boolean attached = false;
 
     public PhotosPresenter(PhotosContract.View view) {
         this.view = view;
@@ -39,7 +39,6 @@ public class PhotosPresenter implements PhotosContract.Presenter {
     @Override
     public void stop() {
         attached = false;
-        //TODO stop listening for network events
     }
 
     @Override
@@ -53,6 +52,7 @@ public class PhotosPresenter implements PhotosContract.Presenter {
                                 PhotosResult result = response.body();
                                 List<Photo> photoList = result.getPhotos().getPhoto();
                                 view.addPhotos(photoList, page);
+                                view.setCurrentPage(page + 1);
                             } else {
                                 view.showError("Network error!");
                                 //TODO change this message to dynamic error from server
@@ -82,6 +82,7 @@ public class PhotosPresenter implements PhotosContract.Presenter {
                                 PhotosResult result = response.body();
                                 List<Photo> photoList = result.getPhotos().getPhoto();
                                 view.showPhotos(photoList);
+                                view.setCurrentPage(2);
                             } else {
                                 view.showError("Network error!");
                                 //TODO change this message to dynamic error from server

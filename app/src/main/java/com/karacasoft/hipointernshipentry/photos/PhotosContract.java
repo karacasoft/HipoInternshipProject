@@ -19,6 +19,7 @@ public interface PhotosContract {
         void setRefreshing(boolean refreshing);
 
         void setLoading(boolean loading);
+        void setCurrentPage(int page);
 
     }
 
