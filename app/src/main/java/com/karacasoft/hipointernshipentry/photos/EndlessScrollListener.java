@@ -63,4 +63,8 @@ public abstract class EndlessScrollListener extends RecyclerView.OnScrollListene
     public void setLoading(boolean loading) {
         this.loading = loading;
     }
+
+    public void setCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
+    }
 }

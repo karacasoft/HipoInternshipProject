@@ -15,6 +15,11 @@ public interface PhotosContract {
     interface View extends BaseView<Presenter> {
         void showPhotos(List<Photo> photos);
         void addPhotos(List<Photo> photos, int page);
+
+        void setRefreshing(boolean refreshing);
+
+        void setLoading(boolean loading);
+
     }
 
     interface Presenter extends BasePresenter {

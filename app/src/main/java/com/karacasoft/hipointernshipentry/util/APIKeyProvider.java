@@ -21,16 +21,4 @@ public class APIKeyProvider {
         }
         return apiKey;
     }
-
-    public static void encryptAPIKey(String apiKey) {
-        int index = 0;
-        for (char c : apiKey.toCharArray()){
-            char c2 = hashKey.charAt(index);
-            System.out.print((int)c + c2 + ", ");
-            index++;
-            if(index >= hashKey.length()) {
-                index = 0;
-            }
-        }
-    }
 }

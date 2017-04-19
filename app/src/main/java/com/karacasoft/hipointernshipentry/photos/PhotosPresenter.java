@@ -1,7 +1,7 @@
 package com.karacasoft.hipointernshipentry.photos;
 
 import com.karacasoft.hipointernshipentry.data.FlickrService;
-import com.karacasoft.hipointernshipentry.data.apiresult.RecentPhotosResult;
+import com.karacasoft.hipointernshipentry.data.apiresult.PhotosResult;
 import com.karacasoft.hipointernshipentry.data.models.Photo;
 import com.karacasoft.hipointernshipentry.util.RetrofitUtils;
 
@@ -45,25 +45,27 @@ public class PhotosPresenter implements PhotosContract.Presenter {
     @Override
     public void onLoadMore(final int page) {
         flickrService.getRecentPhotos(page, RESULTS_PER_PAGE)
-                .enqueue(new Callback<RecentPhotosResult>() {
+                .enqueue(new Callback<PhotosResult>() {
                     @Override
-                    public void onResponse(Call<RecentPhotosResult> call, Response<RecentPhotosResult> response) {
+                    public void onResponse(Call<PhotosResult> call, Response<PhotosResult> response) {
                         if(attached) {
                             if (response.isSuccessful()) {
-                                RecentPhotosResult result = response.body();
+                                PhotosResult result = response.body();
                                 List<Photo> photoList = result.getPhotos().getPhoto();
                                 view.addPhotos(photoList, page);
                             } else {
                                 view.showError("Network error!");
                                 //TODO change this message to dynamic error from server
                             }
+                            view.setLoading(false);
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<RecentPhotosResult> call, Throwable t) {
+                    public void onFailure(Call<PhotosResult> call, Throwable t) {
                         if(attached) {
                             view.showError(t);
+                            view.setLoading(false);
                         }
                     }
                 });
@@ -72,25 +74,29 @@ public class PhotosPresenter implements PhotosContract.Presenter {
     @Override
     public void onRefresh() {
         flickrService.getRecentPhotos(1, RESULTS_PER_PAGE)
-                .enqueue(new Callback<RecentPhotosResult>() {
+                .enqueue(new Callback<PhotosResult>() {
                     @Override
-                    public void onResponse(Call<RecentPhotosResult> call, Response<RecentPhotosResult> response) {
+                    public void onResponse(Call<PhotosResult> call, Response<PhotosResult> response) {
                         if(attached) {
                             if (response.isSuccessful()) {
-                                RecentPhotosResult result = response.body();
+                                PhotosResult result = response.body();
                                 List<Photo> photoList = result.getPhotos().getPhoto();
                                 view.showPhotos(photoList);
                             } else {
                                 view.showError("Network error!");
                                 //TODO change this message to dynamic error from server
                             }
+                            view.setRefreshing(false);
+                            view.setLoading(false);
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<RecentPhotosResult> call, Throwable t) {
+                    public void onFailure(Call<PhotosResult> call, Throwable t) {
                         if(attached) {
                             view.showError(t);
+                            view.setRefreshing(false);
+                            view.setLoading(false);
                         }
                     }
                 });

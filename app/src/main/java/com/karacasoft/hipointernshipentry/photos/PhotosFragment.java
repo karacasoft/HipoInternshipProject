@@ -4,6 +4,8 @@ package com.karacasoft.hipointernshipentry.photos;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -42,6 +44,10 @@ public class PhotosFragment extends Fragment implements PhotosContract.View {
 
     @BindView(R.id.imagesRecyclerView)
     RecyclerView imagesRecyclerView;
+
+    @BindView(R.id.swipeRefreshImages)
+    SwipeRefreshLayout swipeRefreshImages;
+
     private EndlessScrollListener endlessScrollListener;
     private PhotoListAdapter imagesAdapter;
 
@@ -60,8 +66,7 @@ public class PhotosFragment extends Fragment implements PhotosContract.View {
         imagesAdapter = new PhotoListAdapter(getActivity(), photos);
         imagesRecyclerView.setAdapter(imagesAdapter);
         imagesRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
-        imagesRecyclerView.setItemAnimator(new PhotosItemAnimator(getActivity(), R.anim.photos_list_animation_add,
-                R.anim.photos_list_animation_remove));
+        imagesRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
         endlessScrollListener = new EndlessScrollListener(getActivity(), imagesRecyclerView) {
             @Override
@@ -69,6 +74,15 @@ public class PhotosFragment extends Fragment implements PhotosContract.View {
                 presenter.onLoadMore(page);
             }
         };
+
+        swipeRefreshImages.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                presenter.onRefresh();
+                endlessScrollListener.setLoading(true);
+                endlessScrollListener.setCurrentPage(2);
+            }
+        });
 
         setPresenter(new PhotosPresenter(this));
 
@@ -135,7 +149,16 @@ public class PhotosFragment extends Fragment implements PhotosContract.View {
         int oldSize = this.photos.size();
         this.photos.addAll(photos);
         this.imagesAdapter.notifyItemRangeInserted(oldSize, count);
-        endlessScrollListener.setLoading(false);
+    }
+
+    @Override
+    public void setRefreshing(boolean refreshing) {
+        swipeRefreshImages.setRefreshing(refreshing);
+    }
+
+    @Override
+    public void setLoading(boolean loading) {
+        endlessScrollListener.setLoading(loading);
     }
 
     @Override

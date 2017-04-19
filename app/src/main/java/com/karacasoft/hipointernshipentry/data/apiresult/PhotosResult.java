@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.karacasoft.hipointernshipentry.data.models.Photos;
 
-public class RecentPhotosResult {
+public class PhotosResult {
 
     @SerializedName("photos")
     @Expose

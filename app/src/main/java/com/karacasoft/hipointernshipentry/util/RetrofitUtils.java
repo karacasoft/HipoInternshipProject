@@ -15,38 +15,43 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * Created by mahmutkaraca on 4/19/17.
  */
-
 public class RetrofitUtils {
 
     private static FlickrService service;
 
+    private static final Object lock = new Object();
+
     public static FlickrService getFlickrService() {
         if(service == null) {
-            OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-            httpClient.addInterceptor(new Interceptor() {
-                @Override
-                public Response intercept(Chain chain) throws IOException {
-                    Request original = chain.request();
-                    HttpUrl originalUrl = original.url();
+            synchronized (lock) {
+                if(service == null) {
+                    OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+                    httpClient.addInterceptor(new Interceptor() {
+                        @Override
+                        public Response intercept(Chain chain) throws IOException {
+                            Request original = chain.request();
+                            HttpUrl originalUrl = original.url();
 
-                    HttpUrl url = originalUrl.newBuilder()
-                            .addQueryParameter("api_key", APIKeyProvider.getAPIKey())
+                            HttpUrl url = originalUrl.newBuilder()
+                                    .addQueryParameter("api_key", APIKeyProvider.getAPIKey())
+                                    .build();
+
+                            Request newRequest = original.newBuilder()
+                                    .url(url)
+                                    .build();
+                            return chain.proceed(newRequest);
+                        }
+                    });
+
+                    Retrofit retrofit = new Retrofit.Builder()
+                            .baseUrl("https://api.flickr.com/")
+                            .client(httpClient.build())
+                            .addConverterFactory(GsonConverterFactory.create())
                             .build();
 
-                    Request newRequest = original.newBuilder()
-                            .url(url)
-                            .build();
-                    return chain.proceed(newRequest);
+                    service = retrofit.create(FlickrService.class);
                 }
-            });
-
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("https://api.flickr.com/")
-                    .client(httpClient.build())
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-
-            service = retrofit.create(FlickrService.class);
+            }
         }
         return service;
     }
